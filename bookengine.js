@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.0.0";
+  const VERSION = "1.0.1";
 
   // Pinned third-party libraries. Bump deliberately, test, then release.
   const CDN = "https://cdn.jsdelivr.net/npm/";
