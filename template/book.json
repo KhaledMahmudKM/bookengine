@@ -1,0 +1,10 @@
+{
+  "title": "A Book Title",
+  "author": "Your Name",
+  "copyright": "© 2026 Your Name",
+  "description": "One line about this book.",
+  "math": false,
+  "highlightLanguages": [],
+  "styles": [],
+  "scripts": []
+}

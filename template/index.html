@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Per-book: shown in link previews before any JavaScript runs -->
+  <title>A Book Title</title>
+  <meta name="description" content="One line about this book.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+  <script>
+    (function () {
+      // Engine release this book uses. Change the version to upgrade.
+      var ENGINE = "https://cdn.jsdelivr.net/gh/khaledmahmudkm/bookengine@1.0.0/";
+
+      // While previewing on your own machine, use the engine in a sibling
+      // folder (../bookengine/) if there is one, so you can test without
+      // publishing anything. Falls back to ENGINE if it isn't there.
+      var LOCAL = "../bookengine/";
+      var isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+
+      // Theme before first paint, so there's no flash of the wrong palette
+      var saved = null;
+      try { saved = localStorage.getItem("bookengine-theme"); } catch (e) {}
+      document.documentElement.setAttribute("data-theme",
+        saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+
+      function load(base, fallback) {
+        var s = document.createElement("script");
+        s.src = base + "bookengine.js";
+        if (fallback) s.onerror = function () { s.remove(); load(fallback); };
+        document.head.appendChild(s);
+      }
+      if (isLocal) load(LOCAL, ENGINE); else load(ENGINE);
+    })();
+  </script>
+  <style>
+    html { background: #f3f7ec; }
+    html[data-theme="dark"] { background: #10180d; }
+  </style>
+</head>
+<body>
+  <noscript>This book needs JavaScript to display its chapters.</noscript>
+</body>
+</html>
