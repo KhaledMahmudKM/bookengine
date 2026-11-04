@@ -63,6 +63,7 @@ You need internet either way: the Markdown renderer and syntax highlighter come 
 | `math` | `true` loads MathJax for `$…$` and `$$…$$`. Leave it off unless you need it: it's about 1 MB |
 | `highlightLanguages` | Extra highlight.js languages beyond the common set, e.g. `["django"]` for Jinja, `["dockerfile", "nginx"]` |
 | `codeCopy` | `false` hides the Copy button on code blocks |
+| `diagramExport` | `false` hides the Copy/PNG/SVG buttons on diagrams |
 | `styles` | Extra stylesheets, loaded after the theme |
 | `scripts` | Plugin scripts, loaded **in order** before the first chapter renders |
 
@@ -99,6 +100,23 @@ An array in reading order. Each entry is one of:
 | `…/my-book/#/02-setup/opening-ports` | That chapter, scrolled to a section |
 
 The address comes from the file name, so **renaming a chapter file breaks existing links to it**. Settle file names before sharing.
+
+## Diagrams
+
+The engine has no diagram library; draw diagrams as **inline SVG** in the Markdown. Style them with the engine's colour variables (`var(--accent)`, `var(--text)`, `var(--bg-soft)`, …) so they follow the light/dark theme automatically. Wrap each in a `figure` so the engine can attach export controls:
+
+```html
+<figure class="diagram">
+<svg viewBox="0 0 680 300" style="width:100%;height:auto;max-width:680px" role="img" aria-label="describe the diagram">
+<style>.box{ fill:var(--bg-soft); stroke:var(--accent); } .t{ fill:var(--text); font-family:var(--sans); }</style>
+<rect class="box" x="20" y="20" width="200" height="60" rx="8"/><text class="t" x="120" y="55" text-anchor="middle">hello</text>
+</svg>
+</figure>
+```
+
+**Keep the whole `<svg>…</svg>` free of blank lines** — a blank line splits it into separate Markdown blocks and breaks rendering.
+
+On hover, each diagram shows **Copy / PNG / SVG** buttons: Copy puts a PNG on the clipboard (to paste into slides or notes), and PNG/SVG download the file. The engine inlines the current theme's colours and a background into the exported file, so it is self-contained and matches the theme you exported from. Set `"diagramExport": false` in `book.json` to hide these buttons.
 
 ## Theming
 
@@ -172,6 +190,8 @@ Some rules:
 Upgrading any of these is an engine release like any other.
 
 ## Changelog
+
+**1.0.3** — Diagrams (sizable inline SVGs) now show **Copy / PNG / SVG** export buttons on hover, mirroring the code Copy button. The exported file inlines the current theme's colours and a background so it is self-contained. Disable with `"diagramExport": false`.
 
 **1.0.2** — The header logo and title are now separate links: the logo goes to `homeUrl` (your book list), and the **title** goes to the book's own preface. Previously both went to `homeUrl`, so clicking the title left the book.
 

@@ -21,3 +21,6 @@ git push -u origin main
 
 git tag 1.0.2
 git push origin 1.0.2
+
+## Verify it’s live before bumping any book. Wait a couple of minutes, then open:
+https://cdn.jsdelivr.net/gh/khaledmahmudkm/bookengine@1.0.2/bookengine.js

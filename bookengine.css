@@ -511,6 +511,42 @@ a{color:inherit}
 .code-copy:hover{ color:var(--accent); border-color:var(--accent-dim); }
 @media (hover:none){ .code-copy{ opacity:1; } }
 
+/* ── Diagrams (inline SVG) + export controls ───────────────── */
+figure.diagram, .dg-host{
+  position:relative;
+  margin:1.6rem 0;
+  text-align:center;
+}
+figure.diagram svg, .dg-host svg{
+  max-width:100%;
+  height:auto;
+}
+.dg-export{
+  position:absolute;
+  top:0.3rem;
+  right:0.3rem;
+  display:flex;
+  gap:0.3rem;
+  opacity:0;
+  transition:opacity .15s;
+}
+.dg-host:hover .dg-export,
+.dg-export:focus-within{ opacity:1; }
+@media (hover:none){ .dg-export{ opacity:1; } }
+.dg-btn{
+  padding:0.2rem 0.5rem;
+  font-family:var(--mono);
+  font-size:0.68rem;
+  line-height:1.3;
+  color:var(--text-dim);
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  cursor:pointer;
+  transition:color .15s, border-color .15s;
+}
+.dg-btn:hover{ color:var(--accent); border-color:var(--accent-dim); }
+
 @media (prefers-reduced-motion:reduce){
   *{ transition:none !important; scroll-behavior:auto; }
 }
@@ -575,7 +611,7 @@ a{color:inherit}
 /* ── Print: just the chapter ──────────────────────────────── */
 @media print{
   .header, .sidebar, .sidebar-overlay, .chapter-nav, .footer,
-  .code-copy, .heading-anchor{ display:none !important; }
+  .code-copy, .heading-anchor, .dg-export{ display:none !important; }
   body, .content{ background:#fff; }
   .content{ padding:0; }
   .chapter-body{ border:none; padding:0; max-width:none; }

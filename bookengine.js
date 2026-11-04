@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.0.2";
+  const VERSION = "1.0.3";
 
   // Pinned third-party libraries. Bump deliberately, test, then release.
   const CDN = "https://cdn.jsdelivr.net/npm/";
@@ -446,6 +446,128 @@
       });
       pre.appendChild(b);
     });
+
+    // Export controls on diagrams (sizable inline SVGs)
+    if (meta.diagramExport !== false) addDiagramExports(body);
+  }
+
+  // ── Diagram export (copy / PNG / SVG) ──────────────────────
+  const DIAG_VARS = ["--bg", "--bg-soft", "--panel", "--panel-hover", "--border", "--border-soft", "--text", "--text-dim", "--text-faint", "--accent", "--accent-dim", "--accent-glow", "--mono", "--sans"];
+
+  function addDiagramExports(body) {
+    $$("svg", body).forEach(svg => {
+      if (svg.closest("a")) return;                 // skip linked / icon svgs
+      const vb = svg.viewBox && svg.viewBox.baseVal;
+      const w = vb && vb.width ? vb.width : svg.clientWidth;
+      if (!(w >= 200)) return;                       // only sizable diagrams
+      let host = svg.closest("figure.diagram");
+      if (host) host.classList.add("dg-host");
+      else {
+        host = document.createElement("div");
+        host.className = "dg-host";
+        svg.parentNode.insertBefore(host, svg);
+        host.appendChild(svg);
+      }
+      const bar = document.createElement("div");
+      bar.className = "dg-export";
+      bar.innerHTML =
+        '<button type="button" class="dg-btn" data-fmt="copy" aria-label="Copy diagram as image">Copy</button>' +
+        '<button type="button" class="dg-btn" data-fmt="png" aria-label="Download diagram as PNG">PNG</button>' +
+        '<button type="button" class="dg-btn" data-fmt="svg" aria-label="Download diagram as SVG">SVG</button>';
+      bar.addEventListener("click", e => {
+        const btn = e.target.closest(".dg-btn");
+        if (btn) exportDiagram(svg, btn.dataset.fmt, btn);
+      });
+      host.appendChild(bar);
+    });
+  }
+
+  // A self-contained SVG string: theme colors inlined + a solid background,
+  // so the file renders correctly outside the page and in either theme.
+  function standaloneSVG(svg) {
+    const clone = svg.cloneNode(true);
+    const cs = getComputedStyle(document.documentElement);
+    DIAG_VARS.forEach(v => {
+      const val = cs.getPropertyValue(v).trim();
+      if (val) clone.style.setProperty(v, val);
+    });
+    // Let the explicit width/height attributes define the intrinsic size.
+    clone.style.removeProperty("width");
+    clone.style.removeProperty("height");
+    clone.style.removeProperty("max-width");
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    const vb = svg.viewBox && svg.viewBox.baseVal;
+    const W = Math.round(vb && vb.width ? vb.width : (svg.clientWidth || 720));
+    const H = Math.round(vb && vb.height ? vb.height : (svg.clientHeight || 400));
+    if (!clone.getAttribute("viewBox")) clone.setAttribute("viewBox", "0 0 " + W + " " + H);
+    clone.setAttribute("width", W);
+    clone.setAttribute("height", H);
+    const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    bg.setAttribute("x", 0); bg.setAttribute("y", 0);
+    bg.setAttribute("width", W); bg.setAttribute("height", H);
+    bg.setAttribute("fill", cs.getPropertyValue("--bg").trim() || "#ffffff");
+    clone.insertBefore(bg, clone.firstChild);
+    return { str: '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone), W: W, H: H };
+  }
+
+  function diagramFilename(ext) {
+    return (meta.title ? slugify(meta.title) : "book") + "-diagram." + ext;
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function flashBtn(btn, label) {
+    if (!btn.dataset.orig) btn.dataset.orig = btn.textContent;
+    btn.textContent = label;
+    setTimeout(() => { btn.textContent = btn.dataset.orig; }, 1200);
+  }
+
+  function rasterize(svg, onDone, onErr) {
+    const r = standaloneSVG(svg);
+    const url = URL.createObjectURL(new Blob([r.str], { type: "image/svg+xml;charset=utf-8" }));
+    const img = new Image();
+    img.onload = () => {
+      const scale = 2;
+      const canvas = document.createElement("canvas");
+      canvas.width = r.W * scale; canvas.height = r.H * scale;
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(b => b ? onDone(b) : onErr(), "image/png");
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); onErr(); };
+    img.src = url;
+  }
+
+  function exportDiagram(svg, fmt, btn) {
+    try {
+      if (fmt === "svg") {
+        downloadBlob(new Blob([standaloneSVG(svg).str], { type: "image/svg+xml;charset=utf-8" }), diagramFilename("svg"));
+        flashBtn(btn, "Saved");
+        return;
+      }
+      rasterize(svg, blob => {
+        if (fmt === "png") {
+          downloadBlob(blob, diagramFilename("png"));
+          flashBtn(btn, "Saved");
+        } else { // copy to clipboard as an image
+          if (navigator.clipboard && window.ClipboardItem) {
+            navigator.clipboard.write([new ClipboardItem({ "image/png": blob })])
+              .then(() => flashBtn(btn, "Copied"), () => flashBtn(btn, "Failed"));
+          } else {
+            flashBtn(btn, "Use PNG");
+          }
+        }
+      }, () => flashBtn(btn, "Failed"));
+    } catch (e) {
+      console.warn("bookengine: diagram export failed", e);
+      flashBtn(btn, "Failed");
+    }
   }
 
   function scrollToSection(section) {
