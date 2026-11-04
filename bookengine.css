@@ -78,12 +78,26 @@ a{color:inherit}
   gap:11px;
   flex:1;
   min-width:0;
+}
+.brand-logo{
+  display:flex;
+  align-items:center;
+  flex-shrink:0;
   text-decoration:none;
+  color:inherit;
   border-radius:6px;
   transition:opacity .16s;
 }
-a.brand:hover{ opacity:0.8; }
-a.brand:hover .brand-icon{ color:var(--accent-dim); }
+.brand-logo:hover{ opacity:0.8; }
+.brand-logo:hover .brand-icon{ color:var(--accent-dim); }
+.brand-title{
+  display:block;
+  min-width:0;
+  overflow:hidden;
+  text-decoration:none;
+  color:inherit;
+}
+.brand-title:hover #book-title{ color:var(--accent); }
 
 .brand-icon{
   width:26px;

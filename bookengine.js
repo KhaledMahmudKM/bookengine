@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.0.1";
+  const VERSION = "1.0.2";
 
   // Pinned third-party libraries. Bump deliberately, test, then release.
   const CDN = "https://cdn.jsdelivr.net/npm/";
@@ -179,10 +179,16 @@
   }
 
   function buildShell(logo) {
-    const brandInner = `${logo}<h1 id="book-title">${esc(meta.title || "")}</h1>`;
-    const brand = meta.homeUrl
-      ? `<a class="brand" href="${esc(meta.homeUrl)}" aria-label="Home">${brandInner}</a>`
-      : `<div class="brand">${brandInner}</div>`;
+    // The logo links to the book list (homeUrl) when set; the title always
+    // links to this book's own preface. Keeping them separate means clicking
+    // the title never leaves the book.
+    const logoHref = meta.homeUrl ? esc(meta.homeUrl) : "#/";
+    const logoLabel = meta.homeUrl ? "All books" : "Start of the book";
+    const brand =
+      `<div class="brand">` +
+        `<a class="brand-logo" href="${logoHref}" aria-label="${logoLabel}">${logo}</a>` +
+        `<a class="brand-title" href="#/" aria-label="Start of the book"><h1 id="book-title">${esc(meta.title || "")}</h1></a>` +
+      `</div>`;
     document.body.innerHTML = `
 <div class="wrapper">
   <header class="header">

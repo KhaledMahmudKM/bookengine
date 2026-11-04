@@ -55,7 +55,7 @@ You need internet either way: the Markdown renderer and syntax highlighter come 
 | `copyright` | Footer text |
 | `author`, `description` | Fill the author and description meta tags if `index.html` doesn't |
 | `homeLabel` | TOC label for `home.md` (default `"Preface"`) |
-| `homeUrl` | Makes the header logo and title a link, e.g. back to your site. No link if omitted |
+| `homeUrl` | Links the header **logo** here, e.g. back to your site's book list. Omitted, the logo links to the book's own preface. (The **title** always links to the preface.) |
 | `logo` | Header logo image. An `.svg` is inlined, so `stroke="currentColor"` follows the theme's accent colour. Default: an open-book icon |
 | `theme` | Colour and font overrides; see [Theming](#theming) |
 | `fonts` | A Google Fonts stylesheet URL to use instead of the default Inter + JetBrains Mono, or `false` to load no webfonts |
@@ -170,6 +170,10 @@ Some rules:
 | Inter, JetBrains Mono | Google Fonts | unless `fonts` says otherwise |
 
 Upgrading any of these is an engine release like any other.
+
+## Changelog
+
+**1.0.2** — The header logo and title are now separate links: the logo goes to `homeUrl` (your book list), and the **title** goes to the book's own preface. Previously both went to `homeUrl`, so clicking the title left the book.
 
 ## Licence
 

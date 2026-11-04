@@ -14,3 +14,10 @@ git commit -m "more commits"
 git push -u origin main
 ```
 
+# Pushing with tag (example for tag 1.0.2)
+git add -A
+git commit -m "v1.0.2: title links to preface, logo to stacks"
+git push -u origin main
+
+git tag 1.0.2
+git push origin 1.0.2
