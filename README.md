@@ -118,6 +118,8 @@ The engine has no diagram library; draw diagrams as **inline SVG** in the Markdo
 
 On hover, each diagram shows **Copy / PNG / SVG** buttons: Copy puts a PNG on the clipboard (to paste into slides or notes), and PNG/SVG download the file. The engine inlines the current theme's colours and a background into the exported file, so it is self-contained and matches the theme you exported from. Set `"diagramExport": false` in `book.json` to hide these buttons.
 
+Add a caption with `<figcaption>` inside the `figure`, after the `</svg>`. The engine shows it in a smaller, dimmer style with a bold **Figure:** label in front, so a caption never reads like a line of body text. Write only the caption itself; the label is added for you.
+
 ## Theming
 
 Every colour and both font stacks are CSS variables in `bookengine.css`. Override any of them per book. The `--` prefix is optional:
@@ -190,6 +192,8 @@ Some rules:
 Upgrading any of these is an engine release like any other.
 
 ## Changelog
+
+**1.0.4**: Figure captions (`<figcaption>` inside a `figure`) now render smaller and dimmer than body text, with a bold **Figure:** label in front, so they are easy to tell apart from the main text.
 
 **1.0.3** — Diagrams (sizable inline SVGs) now show **Copy / PNG / SVG** export buttons on hover, mirroring the code Copy button. The exported file inlines the current theme's colours and a background so it is self-contained. Disable with `"diagramExport": false`.
 

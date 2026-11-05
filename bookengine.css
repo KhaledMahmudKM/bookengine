@@ -521,6 +521,18 @@ figure.diagram svg, .dg-host svg{
   max-width:100%;
   height:auto;
 }
+/* Figure captions: smaller and dimmer than body text, led by a bold "Figure:" */
+.markdown-body figure figcaption{
+  margin-top:0.55rem;
+  font-size:0.84em;
+  line-height:1.5;
+  color:var(--text-dim);
+}
+.markdown-body figure figcaption::before{
+  content:"Figure: ";
+  font-weight:700;
+  color:var(--text);
+}
 .dg-export{
   position:absolute;
   top:0.3rem;
