@@ -12,7 +12,7 @@
   <script>
     (function () {
       // Engine release this book uses. Change the version to upgrade.
-      var ENGINE = "https://cdn.jsdelivr.net/gh/khaledmahmudkm/bookengine@1.0.5/";
+      var ENGINE = "https://cdn.jsdelivr.net/gh/khaledmahmudkm/bookengine@1.0.6/";
 
       // While previewing on your own machine, use the engine in a sibling
       // folder (../bookengine/) if there is one, so you can test without
@@ -25,9 +25,10 @@
       try { saved = localStorage.getItem("bookengine-theme"); } catch (e) {}
       document.documentElement.setAttribute("data-theme",
         saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
-      // Palette from the last visit to this book (book.json "palette")
+
+      // Colour palette: the reader's choice, else this book's (book.json "palette")
       var pal = null;
-      try { pal = localStorage.getItem("bookengine-palette:" + location.pathname.replace(/[^/]*$/, "")); } catch (e) {}
+      try { var u = localStorage.getItem("bookengine-palette"), b = localStorage.getItem("bookengine-palette:" + location.pathname.replace(/[^/]*$/, "")); pal = (b && b.charAt(0) === "!") ? b.slice(1) : (u || b); } catch (e) {}
       if (pal && pal !== "moss") document.documentElement.setAttribute("data-palette", pal);
 
       function load(base, fallback) {

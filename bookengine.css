@@ -305,6 +305,40 @@ a{color:inherit}
 }
 
 /* ── Overlay (mobile) ─────────────────────────────────────── */
+/* Reader's palette menu, pinned to the bottom of the sidebar */
+.palette-picker{
+  position:sticky;
+  bottom:-1.25rem;
+  margin:1.2rem -0.9rem -1.25rem;
+  padding:0.8rem 1.3rem 1.1rem;
+  background:var(--panel);
+  border-top:1px solid var(--border-soft);
+}
+.palette-picker label{
+  display:block;
+  margin-bottom:0.4rem;
+  font-family:var(--mono);
+  font-size:0.72rem;
+  font-weight:600;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+}
+.palette-picker select{
+  width:100%;
+  padding:0.45rem 0.55rem;
+  font-family:var(--mono);
+  font-size:0.8rem;
+  color:var(--text);
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-left:4px solid var(--accent);
+  border-radius:6px;
+  cursor:pointer;
+}
+.palette-picker select:hover{ border-color:var(--accent); }
+.palette-picker select:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
 .sidebar-overlay{
   display:none;
   position:fixed;

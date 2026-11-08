@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.0.5";
+  const VERSION = "1.0.6";
 
   // Pinned third-party libraries. Bump deliberately, test, then release.
   const CDN = "https://cdn.jsdelivr.net/npm/";
@@ -28,11 +28,18 @@
   };
 
   const THEME_KEY = "bookengine-theme"; // shared by all books on the origin, on purpose
-  // Palette is per book, so its cache key includes the book's path
+  // Colour palettes. The book's default (book.json "palette") is cached per
+  // book; the reader's own choice from the sidebar menu is shared by all books
+  // on the origin, like the light/dark choice.
   const PALETTE_KEY = "bookengine-palette:" + location.pathname.replace(/[^/]*$/, "");
+  const PALETTE_USER_KEY = "bookengine-palette";
   const PALETTES = {
-    moss: "#5a9e2f", harbor: "#2f639e", lagoon: "#247a78",
-    sepia: "#91642b", heather: "#6f3598", clay: "#9e492f"
+    moss:    { label: "Moss (green)",       accent: "#5a9e2f" },
+    harbor:  { label: "Harbor (blue)",      accent: "#2f639e" },
+    lagoon:  { label: "Lagoon (teal)",      accent: "#247a78" },
+    sepia:   { label: "Sepia (amber)",      accent: "#91642b" },
+    heather: { label: "Heather (plum)",     accent: "#6f3598" },
+    clay:    { label: "Clay (terracotta)",  accent: "#9e492f" }
   };
   const BOOK_KEY = location.pathname; // per-book storage namespace
 
@@ -165,18 +172,60 @@
     return `<img class="brand-icon" src="${esc(url)}" alt="">`;
   }
 
-  // book.json "palette": one of the named palettes in bookengine.css.
-  // The choice is cached so index.html can set it before first paint.
-  function applyPalette() {
-    let p = String(meta.palette || "moss").toLowerCase();
-    if (!(p in PALETTES)) {
-      console.warn(`bookengine: unknown palette "${p}"; using "moss". Choose from: ${Object.keys(PALETTES).join(", ")}`);
-      p = "moss";
-    }
+  // book.json "palette" picks the book's default palette; the reader can
+  // override it from the sidebar menu unless "paletteMenu" is false.
+  // index.html reads the same keys to set the palette before first paint;
+  // a "!" prefix there means "ignore the reader's choice for this book".
+  function bookPalette() {
+    const p = String(meta.palette || "moss").toLowerCase();
+    if (p in PALETTES) return p;
+    console.warn(`bookengine: unknown palette "${p}"; using "moss". Choose from: ${Object.keys(PALETTES).join(", ")}`);
+    return "moss";
+  }
+
+  function readerPalette() {
+    if (meta.paletteMenu === false) return null;
+    const p = store.get(PALETTE_USER_KEY);
+    return p && p in PALETTES ? p : null;
+  }
+
+  function setPalette(p) {
     if (p === "moss") document.documentElement.removeAttribute("data-palette");
     else document.documentElement.setAttribute("data-palette", p);
-    store.set(PALETTE_KEY, p);
-    return p;
+    // The book's own "theme" overrides were tuned for its own palette only
+    const custom = $("#bookengine-theme");
+    if (custom) custom.disabled = p !== meta.palette;
+    if (!meta.themeColor) {
+      const m = document.querySelector('meta[name="theme-color"]');
+      if (m) m.setAttribute("content", PALETTES[p].accent);
+    }
+  }
+
+  function applyPalette() {
+    meta.palette = bookPalette();
+    store.set(PALETTE_KEY, (meta.paletteMenu === false ? "!" : "") + meta.palette);
+    setPalette(readerPalette() || meta.palette);
+  }
+
+  function paletteMenuHTML() {
+    if (meta.paletteMenu === false) return "";
+    const cur = readerPalette() || "";
+    const opts = [`<option value="">Book default: ${esc(PALETTES[meta.palette].label.split(" (")[0])}</option>`]
+      .concat(Object.entries(PALETTES).map(([k, v]) =>
+        `<option value="${k}"${k === cur ? " selected" : ""}>${esc(v.label)}</option>`));
+    return `<div class="palette-picker">` +
+      `<label for="palette-select">Colours</label>` +
+      `<select id="palette-select">${opts.join("")}</select></div>`;
+  }
+
+  function initPaletteMenu() {
+    const sel = $("#palette-select");
+    if (!sel) return;
+    sel.addEventListener("change", () => {
+      if (sel.value) store.set(PALETTE_USER_KEY, sel.value);
+      else { try { localStorage.removeItem(PALETTE_USER_KEY); } catch (_) { /* storage blocked */ } }
+      setPalette(sel.value || meta.palette);
+    });
   }
 
   // book.json "theme": { "light": { "accent": "#…" }, "dark": { … } }
@@ -227,6 +276,7 @@
         <button class="sidebar-close" id="sidebar-close" aria-label="Close table of contents">&#x2715;</button>
       </div>
       <nav><ul id="toc"></ul></nav>
+      ${paletteMenuHTML()}
     </aside>
     <main class="content markdown-body" id="content" tabindex="-1">
       <p class="kmb-status">Loading…</p>
@@ -240,6 +290,7 @@
     $("#theme-toggle").addEventListener("click", () =>
       setTheme(currentTheme() === "light" ? "dark" : "light", true));
     setTheme(currentTheme(), false);
+    initPaletteMenu();
     initSidebar();
   }
 
@@ -253,7 +304,7 @@
     };
     put("description", meta.description);
     put("author", meta.author);
-    put("theme-color", meta.themeColor || PALETTES[meta.palette] || PALETTES.moss);
+    put("theme-color", meta.themeColor || PALETTES[readerPalette() || meta.palette].accent);
   }
 
   // ── Sidebar (mobile drawer) ────────────────────────────────
@@ -707,9 +758,10 @@
 
     try { meta = JSON.parse(await fetchText("book.json")); }
     catch (e) { await domReady; fatal("Could not load book.json: " + e.message); return; }
-    meta.palette = applyPalette();
+    meta.palette = bookPalette();
     setHeadMeta();
     applyTheme();
+    applyPalette();
 
     // Webfonts: the default pair, a book's own Google Fonts URL, or none (false)
     if (meta.fonts !== false) loadStyle(typeof meta.fonts === "string" ? meta.fonts : LIBS.fonts);

@@ -57,7 +57,8 @@ You need internet either way: the Markdown renderer and syntax highlighter come 
 | `homeLabel` | TOC label for `home.md` (default `"Preface"`) |
 | `homeUrl` | Links the header **logo** here, e.g. back to your site's book list. Omitted, the logo links to the book's own preface. (The **title** always links to the preface.) |
 | `logo` | Header logo image. An `.svg` is inlined, so `stroke="currentColor"` follows the theme's accent colour. Default: an open-book icon |
-| `palette` | Named colour palette: `moss` (default), `harbor`, `lagoon`, `sepia`, `heather` or `clay`; see [Theming](#theming) |
+| `palette` | The book's default colour palette: `moss` (default), `harbor`, `lagoon`, `sepia`, `heather` or `clay`; see [Theming](#theming) |
+| `paletteMenu` | `false` hides the **Colours** menu, so the book always uses its own palette (default `true`) |
 | `theme` | Colour and font overrides; see [Theming](#theming) |
 | `fonts` | A Google Fonts stylesheet URL to use instead of the default Inter + JetBrains Mono, or `false` to load no webfonts |
 | `themeColor` | Mobile browser bar colour (default: the palette's accent) |
@@ -140,11 +141,15 @@ The quickest way to change a book's colours is a named palette in `book.json`:
 | `heather` | Muted plum | `#6f3598` / `#c199de` |
 | `clay` | Warm grey with a terracotta accent | `#9e492f` / `#dd9984` |
 
-Each palette sets every colour variable below, in both light and dark mode, so diagrams drawn with the variables recolour with it. A palette name the engine doesn't know falls back to `moss`, with a warning in the browser console. The engine remembers each book's palette, and the template's `index.html` applies it before the page first paints, so returning readers see no flash of the default green.
+Each palette sets every colour variable below, in both light and dark mode, so diagrams drawn with the variables recolour with it. A palette name the engine doesn't know falls back to `moss`, with a warning in the browser console.
+
+**Readers can choose their own.** A **Colours** menu at the bottom of the table of contents lists every palette, plus **Book default**. A reader's choice is remembered and applies to every book on the site, the same way the light/dark choice does; choosing **Book default** goes back to the palette in `book.json`. Set `"paletteMenu": false` to hide the menu for a book that must keep its own colours.
+
+The template's `index.html` applies the right palette before the page first paints, so readers see no flash of the default green.
 
 ### Overriding variables
 
-Every colour and both font stacks are CSS variables in `bookengine.css`. Override any of them per book with `theme`; it applies on top of the palette, so you can fine-tune one. The `--` prefix is optional:
+Every colour and both font stacks are CSS variables in `bookengine.css`. Override any of them per book with `theme`; it applies on top of the book's own palette, so you can fine-tune it. Because those overrides were chosen for that palette, they switch off while a reader is using a different one from the menu. The `--` prefix is optional:
 
 ```json
 "theme": {
@@ -214,6 +219,8 @@ Some rules:
 Upgrading any of these is an engine release like any other.
 
 ## Changelog
+
+**1.0.6**: A **Colours** menu at the bottom of the table of contents lets readers pick any palette, or go back to the book's default. The choice is remembered across all books on the site. `"paletteMenu": false` hides it. The template's `index.html` snippet now also applies the reader's choice before first paint; `bump-bookengine.sh` refreshes it in each book.
 
 **1.0.5**: Named colour palettes, chosen per book with `"palette"` in `book.json`: `moss` (default), `harbor`, `lagoon`, `sepia`, `heather`, `clay`. `theme` overrides now apply on top of the palette. The mobile browser bar follows the palette's accent unless `themeColor` is set. The template's `index.html` applies the palette before first paint. Fixed the next/previous button hover text in dark mode, which was hard-coded green.
 
