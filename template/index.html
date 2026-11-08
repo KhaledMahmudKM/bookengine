@@ -12,7 +12,7 @@
   <script>
     (function () {
       // Engine release this book uses. Change the version to upgrade.
-      var ENGINE = "https://cdn.jsdelivr.net/gh/khaledmahmudkm/bookengine@1.0.4/";
+      var ENGINE = "https://cdn.jsdelivr.net/gh/khaledmahmudkm/bookengine@1.0.5/";
 
       // While previewing on your own machine, use the engine in a sibling
       // folder (../bookengine/) if there is one, so you can test without
@@ -25,6 +25,10 @@
       try { saved = localStorage.getItem("bookengine-theme"); } catch (e) {}
       document.documentElement.setAttribute("data-theme",
         saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+      // Palette from the last visit to this book (book.json "palette")
+      var pal = null;
+      try { pal = localStorage.getItem("bookengine-palette:" + location.pathname.replace(/[^/]*$/, "")); } catch (e) {}
+      if (pal && pal !== "moss") document.documentElement.setAttribute("data-palette", pal);
 
       function load(base, fallback) {
         var s = document.createElement("script");
@@ -38,6 +42,16 @@
   <style>
     html { background: #f3f7ec; }
     html[data-theme="dark"] { background: #10180d; }
+    html[data-palette="harbor"] { background: #ecf1f7; }
+    html[data-palette="harbor"][data-theme="dark"] { background: #0d1218; }
+    html[data-palette="lagoon"] { background: #edf6f6; }
+    html[data-palette="lagoon"][data-theme="dark"] { background: #0e1717; }
+    html[data-palette="sepia"] { background: #f6f2ed; }
+    html[data-palette="sepia"][data-theme="dark"] { background: #17130e; }
+    html[data-palette="heather"] { background: #f2eef5; }
+    html[data-palette="heather"][data-theme="dark"] { background: #130f16; }
+    html[data-palette="clay"] { background: #f3f0f0; }
+    html[data-palette="clay"][data-theme="dark"] { background: #141111; }
   </style>
 </head>
 <body>

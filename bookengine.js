@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.0.4";
+  const VERSION = "1.0.5";
 
   // Pinned third-party libraries. Bump deliberately, test, then release.
   const CDN = "https://cdn.jsdelivr.net/npm/";
@@ -28,6 +28,12 @@
   };
 
   const THEME_KEY = "bookengine-theme"; // shared by all books on the origin, on purpose
+  // Palette is per book, so its cache key includes the book's path
+  const PALETTE_KEY = "bookengine-palette:" + location.pathname.replace(/[^/]*$/, "");
+  const PALETTES = {
+    moss: "#5a9e2f", harbor: "#2f639e", lagoon: "#247a78",
+    sepia: "#91642b", heather: "#6f3598", clay: "#9e492f"
+  };
   const BOOK_KEY = location.pathname; // per-book storage namespace
 
   // Where this engine was loaded from, so it can find bookengine.css next to it.
@@ -159,8 +165,23 @@
     return `<img class="brand-icon" src="${esc(url)}" alt="">`;
   }
 
+  // book.json "palette": one of the named palettes in bookengine.css.
+  // The choice is cached so index.html can set it before first paint.
+  function applyPalette() {
+    let p = String(meta.palette || "moss").toLowerCase();
+    if (!(p in PALETTES)) {
+      console.warn(`bookengine: unknown palette "${p}"; using "moss". Choose from: ${Object.keys(PALETTES).join(", ")}`);
+      p = "moss";
+    }
+    if (p === "moss") document.documentElement.removeAttribute("data-palette");
+    else document.documentElement.setAttribute("data-palette", p);
+    store.set(PALETTE_KEY, p);
+    return p;
+  }
+
   // book.json "theme": { "light": { "accent": "#…" }, "dark": { … } }
   // Keys are the CSS variables in bookengine.css, with or without "--".
+  // The selectors outrank the palettes, so "theme" fine-tunes any palette.
   function applyTheme() {
     const t = meta.theme;
     if (!t || typeof t !== "object") return;
@@ -174,7 +195,7 @@
     };
     const style = document.createElement("style");
     style.id = "bookengine-theme";
-    style.textContent = block(":root", t.light) + block(':root[data-theme="dark"]', t.dark);
+    style.textContent = block(":root:not(#_)", t.light) + block(':root:not(#_)[data-theme="dark"]', t.dark);
     document.head.appendChild(style);
   }
 
@@ -232,7 +253,7 @@
     };
     put("description", meta.description);
     put("author", meta.author);
-    put("theme-color", meta.themeColor || "#5a9e2f");
+    put("theme-color", meta.themeColor || PALETTES[meta.palette] || PALETTES.moss);
   }
 
   // ── Sidebar (mobile drawer) ────────────────────────────────
@@ -686,6 +707,7 @@
 
     try { meta = JSON.parse(await fetchText("book.json")); }
     catch (e) { await domReady; fatal("Could not load book.json: " + e.message); return; }
+    meta.palette = applyPalette();
     setHeadMeta();
     applyTheme();
 
