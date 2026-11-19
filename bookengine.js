@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.0.6";
+  const VERSION = "1.0.7";
 
   // Pinned third-party libraries. Bump deliberately, test, then release.
   const CDN = "https://cdn.jsdelivr.net/npm/";
@@ -248,17 +248,24 @@
     document.head.appendChild(style);
   }
 
+  // The "all books" icon: three stacked layers, the site's own mark
+  const STACKS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 3 20 7.5 12 12 4 7.5Z"/><path d="M4 12 12 16.5 20 12"/><path d="M4 16.5 12 21 20 16.5"/></svg>';
+
   function buildShell(logo) {
-    // The logo links to the book list (homeUrl) when set; the title always
-    // links to this book's own preface. Keeping them separate means clicking
-    // the title never leaves the book.
-    const logoHref = meta.homeUrl ? esc(meta.homeUrl) : "#/";
-    const logoLabel = meta.homeUrl ? "All books" : "Start of the book";
+    // The book's own logo and title both lead to this book's preface.
+    // The way out to the book list (homeUrl) is a separate, labelled link
+    // on the right of the header, so the book's logo never leaves the book.
     const brand =
       `<div class="brand">` +
-        `<a class="brand-logo" href="${logoHref}" aria-label="${logoLabel}">${logo}</a>` +
+        `<a class="brand-logo" href="#/" aria-label="Start of the book">${logo}</a>` +
         `<a class="brand-title" href="#/" aria-label="Start of the book"><h1 id="book-title">${esc(meta.title || "")}</h1></a>` +
       `</div>`;
+    const homeLabel = esc(meta.homeLinkText || "All books");
+    const homeLink = meta.homeUrl
+      ? `<a class="home-link" href="${esc(meta.homeUrl)}" title="${homeLabel}" aria-label="${homeLabel}">${STACKS_ICON}<span>${homeLabel}</span></a>`
+      : "";
+    const footerHome = meta.homeUrl
+      ? `<p class="footer-home"><a href="${esc(meta.homeUrl)}">${homeLabel}</a></p>` : "";
     document.body.innerHTML = `
 <div class="wrapper">
   <header class="header">
@@ -266,7 +273,10 @@
       <span></span><span></span><span></span>
     </button>
     ${brand}
-    <button class="theme-btn" id="theme-toggle"></button>
+    <div class="header-actions">
+      ${homeLink}
+      <button class="theme-btn" id="theme-toggle"></button>
+    </div>
   </header>
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
   <div class="container">
@@ -284,6 +294,7 @@
   </div>
   <footer class="footer">
     <p class="footer-copy">${esc(meta.copyright || "")}</p>
+    ${footerHome}
   </footer>
 </div>`;
 

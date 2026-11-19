@@ -55,7 +55,8 @@ You need internet either way: the Markdown renderer and syntax highlighter come 
 | `copyright` | Footer text |
 | `author`, `description` | Fill the author and description meta tags if `index.html` doesn't |
 | `homeLabel` | TOC label for `home.md` (default `"Preface"`) |
-| `homeUrl` | Links the header **logo** here, e.g. back to your site's book list. Omitted, the logo links to the book's own preface. (The **title** always links to the preface.) |
+| `homeUrl` | Your site's book list. Shown as a labelled **All books** link, with a stacks icon, on the right of the header and in the footer. Omitted, there is no such link. (The logo and the title always link to the book's own preface.) |
+| `homeLinkText` | Text of that link (default `All books`). |
 | `logo` | Header logo image. An `.svg` is inlined, so `stroke="currentColor"` follows the theme's accent colour. Default: an open-book icon |
 | `palette` | The book's default colour palette: `moss` (default), `harbor`, `lagoon`, `sepia`, `heather` or `clay`; see [Theming](#theming) |
 | `paletteMenu` | `false` hides the **Colours** menu, so the book always uses its own palette (default `true`) |
@@ -219,6 +220,8 @@ Some rules:
 Upgrading any of these is an engine release like any other.
 
 ## Changelog
+
+**1.0.7**: The header **logo** now links to the book's own preface, like the title, so a book's own logo never takes the reader away. `homeUrl` gets its own labelled link instead: **All books**, with a stacks icon, on the right of the header (icon only on phones) and again in the footer. `homeLinkText` changes its text.
 
 **1.0.6**: A **Colours** menu at the bottom of the table of contents lets readers pick any palette, or go back to the book's default. The choice is remembered across all books on the site. `"paletteMenu": false` hides it. The template's `index.html` snippet now also applies the reader's choice before first paint; `bump-bookengine.sh` refreshes it in each book.
 
