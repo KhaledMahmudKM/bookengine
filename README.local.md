@@ -16,11 +16,11 @@ git push -u origin main
 
 # Pushing with tag (example for tag 1.0.2)
 git add -A
-git commit -m "v1.0.6"
+git commit -m "v1.0.7"
 git push -u origin main
 
-git tag 1.0.6
-git push origin 1.0.6
+git tag 1.0.7
+git push origin 1.0.7
 
 ## Verify it’s live before bumping any book. Wait a couple of minutes, then open:
 https://cdn.jsdelivr.net/gh/khaledmahmudkm/bookengine@1.0.6/bookengine.js

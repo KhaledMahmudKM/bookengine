@@ -221,6 +221,8 @@ Upgrading any of these is an engine release like any other.
 
 ## Changelog
 
+**1.0.8**: New reader palette **Cobalt (blue)**, a saturated royal blue, alongside the existing Harbor, Lagoon, Sepia, Heather and Clay. Set a book's default with `"palette": "cobalt"` in `book.json`, or pick it from the palette menu in the left pane.
+
 **1.0.7**: The header **logo** now links to the book's own preface, like the title, so a book's own logo never takes the reader away. `homeUrl` gets its own labelled link instead: **All books**, with a stacks icon, on the right of the header (icon only on phones) and again in the footer. `homeLinkText` changes its text.
 
 **1.0.6**: A **Colours** menu at the bottom of the table of contents lets readers pick any palette, or go back to the book's default. The choice is remembered across all books on the site. `"paletteMenu": false` hides it. The template's `index.html` snippet now also applies the reader's choice before first paint; `bump-bookengine.sh` refreshes it in each book.

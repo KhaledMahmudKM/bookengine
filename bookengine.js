@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.0.7";
+  const VERSION = "1.0.8";
 
   // Pinned third-party libraries. Bump deliberately, test, then release.
   const CDN = "https://cdn.jsdelivr.net/npm/";
@@ -39,7 +39,8 @@
     lagoon:  { label: "Lagoon (teal)",      accent: "#247a78" },
     sepia:   { label: "Sepia (amber)",      accent: "#91642b" },
     heather: { label: "Heather (plum)",     accent: "#6f3598" },
-    clay:    { label: "Clay (terracotta)",  accent: "#9e492f" }
+    clay:    { label: "Clay (terracotta)",  accent: "#9e492f" },
+    cobalt:  { label: "Cobalt (blue)",      accent: "#1f54c4" }
   };
   const BOOK_KEY = location.pathname; // per-book storage namespace
 
